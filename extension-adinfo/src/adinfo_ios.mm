@@ -27,19 +27,30 @@ void ADInfo_GetAdId()
 {
     if (@available(iOS 14, *))
     {
-        [ATTrackingManager requestTrackingAuthorizationWithCompletionHandler:^(ATTrackingManagerAuthorizationStatus status) {
-            if (status == ATTrackingManagerAuthorizationStatusAuthorized)
-            {
-                ASIdentifierManager* asim = [ASIdentifierManager sharedManager];
-                NSString *uuid = [asim.advertisingIdentifier UUIDString];
-                const char *uuid_lua = [uuid UTF8String];
-                ADInfo_QueueAdId(uuid_lua);
-            }
-            else
-            {
-                ADInfo_QueueAdId("");
-            }
-        }];
+		UIApplication *applicaiton = [UIApplication sharedApplication];
+		
+        if (applicaiton.applicationState == UIApplicationStateActive)
+		{
+			[ATTrackingManager requestTrackingAuthorizationWithCompletionHandler:^(ATTrackingManagerAuthorizationStatus status) {
+				if (status == ATTrackingManagerAuthorizationStatusAuthorized)
+				{
+					ASIdentifierManager* asim = [ASIdentifierManager sharedManager];
+					NSString *uuid = [asim.advertisingIdentifier UUIDString];
+					const char *uuid_lua = [uuid UTF8String];
+					ADInfo_QueueAdId(uuid_lua);
+				}
+				else
+				{
+					ADInfo_QueueAdId("");
+				}
+			}];
+		}
+		else
+		{
+			dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+				ADInfo_GetAdId();
+			});
+		}
     }
     else
     {
