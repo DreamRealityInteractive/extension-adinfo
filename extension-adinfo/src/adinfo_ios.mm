@@ -1,6 +1,7 @@
 #if defined(DM_PLATFORM_IOS)
 #include "adinfo.h"
 #import <AdSupport/AdSupport.h>
+#import <UIKit/UIKit.h>
 
 #if __has_include(<AppTrackingTransparency/ATTrackingManager.h>)
 #import <AppTrackingTransparency/ATTrackingManager.h>
